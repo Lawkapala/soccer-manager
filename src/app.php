@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Europe/Madrid');
+
 use Silex\Application;
 use Silex\Provider\TwigServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
@@ -13,15 +15,21 @@ $app->register(new ValidatorServiceProvider());
 $app->register(new ServiceControllerServiceProvider());
 $app->register(new TwigServiceProvider());
 $app->register(new HttpFragmentServiceProvider());
+
 $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
 
     return $twig;
 }));
+
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-        'driver'   => 'pdo_sqlite',
-        'path'     => __DIR__.'/app.db',
+        'driver'    => 'pdo_mysql',
+        'host'      => 'localhost',
+        'dbname'    => 'sx_fut7',
+        'user'      => 'root',
+        'password'  => '',
+        'charset'   => 'utf8',
     ),
 ));
 
