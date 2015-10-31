@@ -1,0 +1,53 @@
+----------
+DataBase
+----------
+matchday
+    id                  int
+    name                varchar
+
+match
+    id                  int
+    matchday_id         int         FK
+    home_team           int         FK
+    score_home_team     int
+    away_team           int         FK
+    score_away_team     int
+    match_day           date
+    location            varchar
+    played              boolean
+
+player
+    id                  int
+    name                varchar
+    position_id         int         FK
+    team_id             int         FK
+
+event
+    id                  int
+    name                varchar
+
+match_event
+    id                  int
+    match_id            int         FK
+    player_id           int         FK
+    event_id            int         FK
+
+team
+    id                  int
+    name                varchar
+    shield_name         varchar
+
+position
+    id                  int
+    name                varchar
+
+----------
+Routing
+----------
+/                   -> home
+/jornada            -> show matches
+/jornada/detalle    -> show resume of the match
+/jornadas           -> show all matches
+/clasificación      -> show info of match
+/jugadores          -> listing of players
+/jugadores/{id}     -> detail of player
