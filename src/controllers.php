@@ -14,9 +14,46 @@ $app->get('/', function () use ($app) {
 ->bind('homepage')
 ;
 
+$app->get('/jornada', function() use ($app) {
+    return $app['twig']->render('matchday.html', array());
+})
+->bind('jornada')
+;
+
+$app->get('/jornada/{id}', function() use ($app) {
+    return $app['twig']->render('match.html', array());
+})
+->bind('partido')
+;
+
+$app->get('/jornadas', function() use ($app) {
+    return $app['twig']->render('matchdays.html', array());
+})
+->bind('jornadas')
+;
+
+$app->get('/clasificacion', function() use ($app) {
+    return $app['twig']->render('teamtable.html', array());
+})
+->bind('clasificacion')
+;
+
+$app->get('/jugadores', function() use ($app) {
+    return $app['twig']->render('players.html', array());
+})
+->bind('jugadores')
+;
+
+$app->get('/jugadores/{id}', function() use ($app) {
+    return $app['twig']->render('player.html', array());
+})
+->bind('jugador')
+;
+
 $app->error(function (\Exception $e, $code) use ($app) {
     if ($app['debug']) {
-        return;
+        var_dump(array($e->getMessage(),$code));
+       // return;
     }
 
     // 404.html, or 40x.html, or 4xx.html, or error.html

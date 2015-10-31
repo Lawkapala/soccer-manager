@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    Welcome to your new Silex Application!
+    Welcome to your new Silex Application!<br />
+    <a href="{{ app.url_generator.generate('jornada') }}">Jornada</a><br />
+    <a href="{{ app.url_generator.generate('jornadas') }}">Jornadas</a><br />
+    <a href="{{ app.url_generator.generate('clasificacion') }}">Clasificación</a><br />
+    <a href="{{ app.url_generator.generate('jugadores') }}">Jugadores</a><br />
+    #{{ app.request.basepath }}#
+    !{{ pi }}!
 {% endblock %}
