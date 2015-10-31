@@ -18,6 +18,11 @@ $app->register(new HttpFragmentServiceProvider());
 
 $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
+    $twig->addGlobal('pi', 3.14);
+
+    $twig->addFunction(new \Twig_SimpleFunction('asset', function ($asset) use ($app) {
+        return $app['request_stack']->getMasterRequest()->getBasepath().'/'.$asset;
+    }));
 
     return $twig;
 }));
