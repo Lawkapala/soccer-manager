@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title '' %} - My Admin Silex Application</title>
+
+        <link href="{{ asset('css/admin/main.css') }}" rel="stylesheet" type="text/css" />
+
+    </head>
+    <body>
+        <div class="content">
+            <h3>.:: ADMIN ::.</h3>
+
+            {% block content %}{% endblock %}
+
+            <br />
+
+            <div class="footer">
+                <a href="{{ app.url_generator.generate('admin') }}">Home[Admin]</a> |
+                <a href="{{ app.url_generator.generate('homepage') }}">Home[Front]</a>
+            </div>
+        </div>
+    </body>
+</html>

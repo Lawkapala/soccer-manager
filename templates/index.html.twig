@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "layout.html.twig" %}
 
 {% block content %}
     Welcome to your new Silex Application!<br />
@@ -6,6 +6,6 @@
     <a href="{{ app.url_generator.generate('jornadas') }}">Jornadas</a><br />
     <a href="{{ app.url_generator.generate('clasificacion') }}">Clasificación</a><br />
     <a href="{{ app.url_generator.generate('jugadores') }}">Jugadores</a><br />
-    #{{ app.request.basepath }}#
-    !{{ pi }}!
+    # app.request.basepath = {{ app.request.basepath }} #<br />
+    # test global twig var ('pi', 3.14) => value of 'pi' {{ pi }} #<br />
 {% endblock %}

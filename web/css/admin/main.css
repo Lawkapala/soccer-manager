@@ -1,0 +1,21 @@
+body {
+    background-color: #cccccc;
+}
+
+.content a {
+    color: darkgreen;
+    background-color: chartreuse;
+    text-decoration: none;
+}
+
+.content a:hover{
+    color: #880000;
+    background-color: coral;
+    text-decoration: none;
+}
+
+.content a:visited{
+    color: white;
+    background-color: black;
+    text-decoration: none;
+}

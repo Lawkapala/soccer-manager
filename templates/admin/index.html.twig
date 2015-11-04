@@ -1,0 +1,11 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    Welcome to your new Admin Silex Application!<br />
+    <a href="{{ app.url_generator.generate('posiciones') }}">Eventos jugador</a><br />
+    <a href="{{ app.url_generator.generate('posiciones') }}">Jornadas</a><br />
+    <a href="{{ app.url_generator.generate('posiciones') }}">Partidos</a><br />
+    <a href="{{ app.url_generator.generate('posiciones') }}">Jugadores</a><br />
+    <a href="{{ app.url_generator.generate('posiciones') }}">Posiciones</a><br />
+    <a href="{{ app.url_generator.generate('posiciones') }}">Equipos</a><br />
+{% endblock %}
