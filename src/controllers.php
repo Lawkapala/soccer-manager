@@ -78,8 +78,6 @@ $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
 
-        echo "<pre>";print_r($data);echo "</pre>";
-
         if (isset($data['name']) && !empty($data['name'])) {
             $app['db']->insert('player_position', array('name'=>$data['name']));
 
@@ -89,7 +87,6 @@ $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
 
     // get all positions saved in DB
     $positions = $app['db']->fetchAll('SELECT * FROM player_position');
-
 
 
     return $app['twig']->render('admin/position.html.twig', array('positions'=>$positions,'form'=>$form->createView()));
