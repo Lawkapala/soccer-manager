@@ -8,48 +8,96 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 //Request::setTrustedProxies(array('127.0.0.1'));
 
+/**
+ * FRONT CONTROLLERS
+ */
 $app->get('/', function () use ($app) {
-    return $app['twig']->render('index.html', array());
+    return $app['twig']->render('index.html.twig', array());
 })
 ->bind('homepage')
 ;
 
 $app->get('/jornada', function() use ($app) {
-    return $app['twig']->render('matchday.html', array());
+    return $app['twig']->render('matchday.html.twig', array());
 })
 ->bind('jornada')
 ;
 
 $app->get('/jornada/{id}', function() use ($app) {
-    return $app['twig']->render('match.html', array());
+    return $app['twig']->render('match.html.twig', array());
 })
 ->bind('partido')
 ;
 
 $app->get('/jornadas', function() use ($app) {
-    return $app['twig']->render('matchdays.html', array());
+    return $app['twig']->render('matchdays.html.twig', array());
 })
 ->bind('jornadas')
 ;
 
 $app->get('/clasificacion', function() use ($app) {
-    return $app['twig']->render('teamtable.html', array());
+    return $app['twig']->render('teamtable.html.twig', array());
 })
 ->bind('clasificacion')
 ;
 
 $app->get('/jugadores', function() use ($app) {
-    return $app['twig']->render('players.html', array());
+    return $app['twig']->render('players.html.twig', array());
 })
 ->bind('jugadores')
 ;
 
 $app->get('/jugadores/{id}', function() use ($app) {
-    return $app['twig']->render('player.html', array());
+    return $app['twig']->render('player.html.twig', array());
 })
 ->bind('jugador')
 ;
 
+
+/**
+ * ADMIN CONTROLLERS
+ */
+$app->get('/admin', function() use ($app) {
+    return $app['twig']->render('admin/index.html.twig', array());
+})
+->bind('admin')
+;
+
+$app->match('/admin/posiciones/form', function(Request $request) use ($app) {
+    $data = array('name'=>'');
+
+    $form = $app['form.factory']->createBuilder('form',$data)
+        ->add(
+            'name', 'text',
+            array('label' => 'Nombre')
+        )
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+
+        echo "<pre>";print_r($data);echo "</pre>";
+
+        if (isset($data['name']) && !empty($data['name'])) {
+            $app['db']->insert('player_position', array('name'=>$data['name']));
+
+            return $app->redirect($app['url_generator']->generate('posiciones'));
+        }
+    }
+
+    // get all positions saved in DB
+    $positions = $app['db']->fetchAll('SELECT * FROM player_position');
+
+
+
+    return $app['twig']->render('admin/position.html.twig', array('positions'=>$positions,'form'=>$form->createView()));
+})
+->bind('posiciones')
+;
+
+// error controller
 $app->error(function (\Exception $e, $code) use ($app) {
     if ($app['debug']) {
         var_dump(array($e->getMessage(),$code));
@@ -58,10 +106,10 @@ $app->error(function (\Exception $e, $code) use ($app) {
 
     // 404.html, or 40x.html, or 4xx.html, or error.html
     $templates = array(
-        'errors/'.$code.'.html',
-        'errors/'.substr($code, 0, 2).'x.html',
-        'errors/'.substr($code, 0, 1).'xx.html',
-        'errors/default.html',
+        'errors/'.$code.'.html.twig',
+        'errors/'.substr($code, 0, 2).'x.html.twig',
+        'errors/'.substr($code, 0, 1).'xx.html.twig',
+        'errors/default.html.twig',
     );
 
     return new Response($app['twig']->resolveTemplate($templates)->render(array('code' => $code)), $code);
