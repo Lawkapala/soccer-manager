@@ -37,7 +37,7 @@ team
     name                varchar
     shield_name         varchar
 
-position
+player_position
     id                  int
     name                varchar
 

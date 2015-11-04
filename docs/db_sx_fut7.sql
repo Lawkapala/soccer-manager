@@ -89,9 +89,9 @@ CREATE TABLE `player` (
 
 /*Table structure for table `postion` */
 
-DROP TABLE IF EXISTS `position`;
+DROP TABLE IF EXISTS `player_position`;
 
-CREATE TABLE `position` (
+CREATE TABLE `player_position` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
