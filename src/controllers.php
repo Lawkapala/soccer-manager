@@ -63,6 +63,58 @@ $app->get('/admin', function() use ($app) {
 ->bind('admin')
 ;
 
+$app->match('/admin/eventos/form', function(Request $request) use ($app) {
+    $data = array('name'=>'');
+
+    $form = $app['form.factory']->createBuilder('form',$data)
+        ->add(
+            'name', 'text',
+            array('label' => 'Nombre')
+        )
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+
+        if (isset($data['name']) && !empty($data['name'])) {
+            $app['db']->insert('event', array('name'=>$data['name']));
+
+            return $app->redirect($app['url_generator']->generate('eventos'));
+        }
+    }
+
+    //get all events saved in DB
+    $events = $app['db']->fetchAll('SELECT * FROM event');
+
+echo "<pre>";print_r(__DIR__);echo "</pre>";
+echo "<pre>";print_r(__DIR__);echo "</pre>";
+
+    //get all images saved
+    $img = array();
+    $finfo = finfo_open();
+    $basePath = __DIR__.'/../web/img/';
+    foreach(glob(__DIR__.'/../web/img/*.png') as $img_file) {
+
+        $info = finfo_file($finfo,$img_file);
+//        echo "<pre>";print_r($img_file);echo "</pre>";
+//        echo "<pre>";print_r($i);echo "</pre>";
+
+        $name = substr($img_file, strlen($basePath));
+        $i[] = array($img_file, $info, $name);
+
+
+        $img[] = $img_file;
+    }
+
+    echo "<pre>";print_r($i);echo "</pre>";
+
+    return $app['twig']->render('admin/event.html.twig', array('events'=>$events,'form'=>$form->createView(),'img'=>$img));
+})
+->bind('eventos')
+;
+
 $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
     $data = array('name'=>'');
 

@@ -1,0 +1,48 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    <div>
+        ADMIN :: player_events
+        <br />
+        <img src="{{ asset('web/img/roja.png') }}" />
+    </div>
+
+    <br />
+
+    <div>
+        EVENTS ALREADY CONFIGURED :: {{ events|length }}<br />
+
+        {% if events|length > 0 %}
+            <ul>
+            {% for event in events %}
+                <li>{{ event.name }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br />
+
+    <div>
+        {% for i in img %}
+            <img src="{{ asset(i) }}" /><br />
+        {% endfor %}
+    </div>
+
+    <br />
+
+    <form action="" method="post">
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+
+        <div>
+            {{ form_label(form.name) }}
+            {{ form_errors(form.name) }}
+            {{ form_widget(form.name) }}
+        </div>
+
+        <br />
+
+        <input type="submit" name="submit" value="Enviar" />
+    </form>
+{% endblock %}
