@@ -66,10 +66,43 @@ $app->get('/admin', function() use ($app) {
 $app->match('/admin/eventos/form', function(Request $request) use ($app) {
     $data = array('name'=>'');
 
+    //get all images saved
+    $img = array();
+    $finfo = finfo_open();
+    $basePath = __DIR__.'/../web/img/';
+    $img_choices = array();
+    foreach(glob(__DIR__.'/../web/img/*.png') as $img_file) {
+
+        $info = finfo_file($finfo,$img_file);
+//        echo "<pre>";print_r($img_file);echo "</pre>";
+//        echo "<pre>";print_r($i);echo "</pre>";
+
+        $fullName = substr($img_file, strlen($basePath));
+        $name = substr($fullName,0,-4);
+
+        $img_choices[$name] = $fullName;
+
+        $i[] = array($img_file, $info, $name);
+
+
+        $img[] = $img_file;
+    }
+
     $form = $app['form.factory']->createBuilder('form',$data)
         ->add(
             'name', 'text',
             array('label' => 'Nombre')
+        )
+        ->add(
+            'image', 'choice',
+            array(
+                'choices' => $img_choices,
+                'expanded' => false,
+                'multiple' => false,
+                'placeholder' => 'Selecciona imagen',
+                'empty_data' => 3,
+                //'required' => false
+            )
         )
         ->getForm();
 
@@ -77,38 +110,20 @@ $app->match('/admin/eventos/form', function(Request $request) use ($app) {
 
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
-
+echo "<pre>";print_r($data);echo "</pre>";
         if (isset($data['name']) && !empty($data['name'])) {
-            $app['db']->insert('event', array('name'=>$data['name']));
-
-            return $app->redirect($app['url_generator']->generate('eventos'));
+//            $app['db']->insert('event', array('name'=>$data['name']));
+//
+//            return $app->redirect($app['url_generator']->generate('eventos'));
         }
     }
 
     //get all events saved in DB
     $events = $app['db']->fetchAll('SELECT * FROM event');
 
-echo "<pre>";print_r(__DIR__);echo "</pre>";
-echo "<pre>";print_r(__DIR__);echo "</pre>";
-
-    //get all images saved
-    $img = array();
-    $finfo = finfo_open();
-    $basePath = __DIR__.'/../web/img/';
-    foreach(glob(__DIR__.'/../web/img/*.png') as $img_file) {
-
-        $info = finfo_file($finfo,$img_file);
-//        echo "<pre>";print_r($img_file);echo "</pre>";
-//        echo "<pre>";print_r($i);echo "</pre>";
-
-        $name = substr($img_file, strlen($basePath));
-        $i[] = array($img_file, $info, $name);
 
 
-        $img[] = $img_file;
-    }
-
-    echo "<pre>";print_r($i);echo "</pre>";
+//    echo "<pre>";print_r($i);echo "</pre>";
 
     return $app['twig']->render('admin/event.html.twig', array('events'=>$events,'form'=>$form->createView(),'img'=>$img));
 })
