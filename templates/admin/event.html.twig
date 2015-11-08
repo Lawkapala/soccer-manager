@@ -8,6 +8,16 @@
     <br />
 
     <div>
+        AVAILABLE IMG FOR EVENTS :: <br />
+
+        {% for imgFile,imgName in availableImages %}
+            <span>
+                <img src="{{ asset(imgPath~imgFile) }}" title="{{ imgName }}" /> {{ imgName }}
+            </span>
+        {% endfor %}
+
+        <br /><br />
+
         EVENTS ALREADY CONFIGURED :: {{ events|length }}<br />
 
         {% if events|length > 0 %}

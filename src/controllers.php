@@ -120,7 +120,14 @@ $app->match('/admin/eventos', function(Request $request) use ($app) {
     //get all events saved in DB
     $events = $app['db']->fetchAll('SELECT * FROM event');
 
-    return $app['twig']->render('admin/event.html.twig', array('events'=>$events,'form'=>$form->createView()));
+    return $app['twig']
+        ->render('admin/event.html.twig',
+            array(
+                'events'            =>  $events,
+                'availableImages'   =>  $img_choices,
+                'form'              =>  $form->createView()
+            )
+        );
 })
 ->bind('eventos')
 ;
