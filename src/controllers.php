@@ -63,31 +63,21 @@ $app->get('/admin', function() use ($app) {
 ->bind('admin')
 ;
 
-$app->match('/admin/eventos/form', function(Request $request) use ($app) {
+$app->match('/admin/eventos', function(Request $request) use ($app) {
     $data = array('name'=>'');
 
     //get all images saved
-    $img = array();
-    $finfo = finfo_open();
     $basePath = __DIR__.'/../web/img/';
     $img_choices = array();
-    foreach(glob(__DIR__.'/../web/img/*.png') as $img_file) {
 
-        $info = finfo_file($finfo,$img_file);
-//        echo "<pre>";print_r($img_file);echo "</pre>";
-//        echo "<pre>";print_r($i);echo "</pre>";
-
+    foreach(glob($basePath.'*.png') as $img_file) {
         $fullName = substr($img_file, strlen($basePath));
         $name = substr($fullName,0,-4);
 
-        $img_choices[$name] = $fullName;
-
-        $i[] = array($img_file, $info, $name);
-
-
-        $img[] = $img_file;
+        $img_choices[$fullName] = $name;
     }
 
+    //create form
     $form = $app['form.factory']->createBuilder('form',$data)
         ->add(
             'name', 'text',
@@ -100,32 +90,37 @@ $app->match('/admin/eventos/form', function(Request $request) use ($app) {
                 'expanded' => false,
                 'multiple' => false,
                 'placeholder' => 'Selecciona imagen',
-                'empty_data' => 3,
-                //'required' => false
+                'required' => false
             )
         )
         ->getForm();
 
     $form->handleRequest($request);
 
+    //handle form request
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
-echo "<pre>";print_r($data);echo "</pre>";
+
+        $fields = array();
+
         if (isset($data['name']) && !empty($data['name'])) {
-//            $app['db']->insert('event', array('name'=>$data['name']));
-//
-//            return $app->redirect($app['url_generator']->generate('eventos'));
+            $fields['name'] = $data['name'];
         }
+
+        if (isset($data['image']) && !empty($data['image'])) {
+            $fields['img_event'] = $data['image'];
+        }
+
+        $app['db']->insert('event', $fields);
+
+        return $app->redirect($app['url_generator']->generate('eventos'));
+
     }
 
     //get all events saved in DB
     $events = $app['db']->fetchAll('SELECT * FROM event');
 
-
-
-//    echo "<pre>";print_r($i);echo "</pre>";
-
-    return $app['twig']->render('admin/event.html.twig', array('events'=>$events,'form'=>$form->createView(),'img'=>$img));
+    return $app['twig']->render('admin/event.html.twig', array('events'=>$events,'form'=>$form->createView()));
 })
 ->bind('eventos')
 ;

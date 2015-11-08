@@ -13,21 +13,13 @@
         {% if events|length > 0 %}
             <ul>
             {% for event in events %}
-                <li>{{ event.name }}</li>
+                <li>{{ event.name }} :: {% if event.img_event %}<img src="{{ asset(imgPath~event.img_event) }}" />{% endif %}</li>
             {% endfor %}
             </ul>
         {% endif %}
     </div>
 
     <br />
-
-    {#<div>
-        {% for i in img %}
-            <img src="{{ asset(i) }}" /><br />
-        {% endfor %}
-    </div>
-
-    <br />#}
 
     <form action="" method="post">
         {{ form_errors(form) }}
