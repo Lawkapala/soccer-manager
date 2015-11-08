@@ -1,0 +1,60 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    <div>
+        ADMIN :: teams
+    </div>
+
+    <br />
+
+    <div>
+        AVAILABLE IMG FOR TEAMS :: <br />
+
+        {% for imgFile,imgName in availableImages %}
+            <span>
+                <img width="80" src="{{ asset(teamImgPath~imgFile) }}" title="{{ imgName }}" /> {{ imgName }}
+            </span>
+        {% endfor %}
+
+        <br /><br />
+
+        TEAMS ALREADY CONFIGURED :: {{ teams|length }}<br />
+
+        {% if teams|length > 0 %}
+            <ul>
+            {% for team in teams %}
+                <li>{% if team.user_team %}<strong>{{ team.name }}</strong>{% else %}{{ team.name }}{% endif %} :: <img width="32" src="{{ asset(teamImgPath~team.shield_name) }}" title="{{ team.name }}" /></li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br />
+
+    <form action="" method="post">
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+
+        <div>
+            {{ form_label(form.name) }}
+            {{ form_errors(form.name) }}
+            {{ form_widget(form.name) }}
+        </div>
+
+        <div>
+            {{ form_label(form.image) }}
+            {{ form_errors(form.image) }}
+            {{ form_widget(form.image) }}
+        </div>
+
+        <div>
+            {{ form_label(form.webTeam) }}
+            {{ form_errors(form.webTeam) }}
+            {{ form_widget(form.webTeam) }}
+        </div>
+
+        <br />
+
+        <input type="submit" name="submit" value="Enviar" />
+    </form>
+{% endblock %}

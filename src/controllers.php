@@ -158,7 +158,7 @@ $app->match('/admin/jornadas/form', function(Request $request) use ($app) {
     $matchdays = $app['db']->fetchAll('SELECT * FROM matchday');
 
 
-    return $app['twig']->render('admin/jornadas.html.twig', array('matchdays'=>$matchdays,'form'=>$form->createView()));
+    return $app['twig']->render('admin/matchdays.html.twig', array('matchdays'=>$matchdays,'form'=>$form->createView()));
 })
 ->bind('jornadas')
 ;
@@ -195,32 +195,82 @@ $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
 ;
 
 $app->match('/admin/equipos/form', function(Request $request) use ($app) {
-    $data = array('name'=>'');
+    //get all images saved
+    $basePath = __DIR__.'/../web/img/teams/';
+    $img_choices = array();
 
-    $form = $app['form.factory']->createBuilder('form',$data)
+    foreach(glob($basePath.'*.png') as $img_file) {
+        $fullName = substr($img_file, strlen($basePath));
+        $name = substr($fullName,0,-4);
+
+        $img_choices[$fullName] = $name;
+    }
+
+    //create form
+    $form = $app['form.factory']->createBuilder('form')
         ->add(
             'name', 'text',
             array('label' => 'Nombre')
+        )
+        ->add(
+            'image', 'choice',
+            array(
+                'choices' => $img_choices,
+                'expanded' => false,
+                'multiple' => false,
+                'required' => false,
+                'data'=> 'default.png'
+            )
+        )
+        ->add(
+            'webTeam', 'choice',
+            array(
+                'label' => 'Equipo de la web',
+                'choices' => array(0=>'No', 1=>'Si'),
+                'expanded' => true,
+                'data'=> 0
+            )
         )
         ->getForm();
 
     $form->handleRequest($request);
 
+    //handle form request
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
 
-        if (isset($data['name']) && !empty($data['name'])) {
-            $app['db']->insert('team', array('name'=>$data['name']));
+        $fields = array();
+        echo "<pre>";print_r($data);echo "</pre>";
 
-            return $app->redirect($app['url_generator']->generate('equipos'));
+        if (isset($data['name']) && !empty($data['name'])) {
+            $fields['name'] = $data['name'];
         }
+
+        if (isset($data['image']) && !empty($data['image'])) {
+            $fields['shield_name'] = $data['image'];
+        }
+
+        if (isset($data['webTeam']) && !empty($data['webTeam'])) {
+            $fields['user_team'] = $data['webTeam'];
+        }
+
+        $app['db']->insert('team', $fields);
+
+        return $app->redirect($app['url_generator']->generate('equipos'));
+
     }
 
-    // get all positions saved in DB
-    $teams = $app['db']->fetchAll('SELECT * FROM teams');
+    //get all events saved in DB
+    $teams = $app['db']->fetchAll('SELECT * FROM team');
 
-
-    return $app['twig']->render('admin/jornadas.html.twig', array('teams'=>$teams,'form'=>$form->createView()));
+    return $app['twig']
+        ->render('admin/teams.html.twig',
+            array(
+                'teams'            =>  $teams,
+                'availableImages'   =>  $img_choices,
+                'form'              =>  $form->createView()
+            )
+        );
 })
     ->bind('equipos')
 ;

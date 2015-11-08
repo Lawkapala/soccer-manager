@@ -24,6 +24,7 @@ $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
     // add custom globals, filters, tags, ...
     $twig->addGlobal('imgPath', 'img/');
     $twig->addGlobal('eventImgPath', 'img/events/');
+    $twig->addGlobal('teamImgPath', 'img/teams/');
 
     $twig->addFunction(new \Twig_SimpleFunction('asset', function ($asset) use ($app) {
         return $app['request_stack']->getMasterRequest()->getBasepath().'/'.$asset;
