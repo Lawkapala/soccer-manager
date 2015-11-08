@@ -1,0 +1,38 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    <div>
+        ADMIN :: matchdays
+    </div>
+
+    <br />
+
+    <div>
+        MATCHDAY ALREADY CONFIGURED :: {{ matchdays|length }}<br />
+
+        {% if matchdays|length > 0 %}
+            <ul>
+            {% for matchday in matchdays %}
+                <li>{{ matchday.name }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br />
+
+    <form action="" method="post">
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+
+        <div>
+            {{ form_label(form.name) }}
+            {{ form_errors(form.name) }}
+            {{ form_widget(form.name) }}
+        </div>
+
+        <br />
+
+        <input type="submit" name="submit" value="Enviar" />
+    </form>
+{% endblock %}

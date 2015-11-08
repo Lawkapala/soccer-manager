@@ -125,6 +125,37 @@ $app->match('/admin/eventos', function(Request $request) use ($app) {
 ->bind('eventos')
 ;
 
+$app->match('/admin/jornadas/form', function(Request $request) use ($app) {
+    $data = array('name'=>'');
+
+    $form = $app['form.factory']->createBuilder('form',$data)
+        ->add(
+            'name', 'text',
+            array('label' => 'Nombre')
+        )
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+
+        if (isset($data['name']) && !empty($data['name'])) {
+            $app['db']->insert('matchday', array('name'=>$data['name']));
+
+            return $app->redirect($app['url_generator']->generate('jornadas'));
+        }
+    }
+
+    // get all positions saved in DB
+    $matchdays = $app['db']->fetchAll('SELECT * FROM matchday');
+
+
+    return $app['twig']->render('admin/jornadas.html.twig', array('matchdays'=>$matchdays,'form'=>$form->createView()));
+})
+->bind('jornadas')
+;
+
 $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
     $data = array('name'=>'');
 
