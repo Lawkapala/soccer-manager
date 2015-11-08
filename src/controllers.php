@@ -67,7 +67,7 @@ $app->match('/admin/eventos', function(Request $request) use ($app) {
     $data = array('name'=>'');
 
     //get all images saved
-    $basePath = __DIR__.'/../web/img/';
+    $basePath = __DIR__.'/../web/img/events/';
     $img_choices = array();
 
     foreach(glob($basePath.'*.png') as $img_file) {
@@ -192,6 +192,37 @@ $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
     return $app['twig']->render('admin/position.html.twig', array('positions'=>$positions,'form'=>$form->createView()));
 })
 ->bind('posiciones')
+;
+
+$app->match('/admin/equipos/form', function(Request $request) use ($app) {
+    $data = array('name'=>'');
+
+    $form = $app['form.factory']->createBuilder('form',$data)
+        ->add(
+            'name', 'text',
+            array('label' => 'Nombre')
+        )
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+
+        if (isset($data['name']) && !empty($data['name'])) {
+            $app['db']->insert('team', array('name'=>$data['name']));
+
+            return $app->redirect($app['url_generator']->generate('equipos'));
+        }
+    }
+
+    // get all positions saved in DB
+    $teams = $app['db']->fetchAll('SELECT * FROM teams');
+
+
+    return $app['twig']->render('admin/jornadas.html.twig', array('teams'=>$teams,'form'=>$form->createView()));
+})
+    ->bind('equipos')
 ;
 
 // error controller

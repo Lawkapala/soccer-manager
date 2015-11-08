@@ -12,7 +12,7 @@
 
         {% for imgFile,imgName in availableImages %}
             <span>
-                <img src="{{ asset(imgPath~imgFile) }}" title="{{ imgName }}" /> {{ imgName }}
+                <img src="{{ asset(eventImgPath~imgFile) }}" title="{{ imgName }}" /> {{ imgName }}
             </span>
         {% endfor %}
 
@@ -23,7 +23,7 @@
         {% if events|length > 0 %}
             <ul>
             {% for event in events %}
-                <li>{{ event.name }} :: {% if event.img_event %}<img src="{{ asset(imgPath~event.img_event) }}" />{% endif %}</li>
+                <li>{{ event.name }} :: {% if event.img_event %}<img src="{{ asset(eventImgPath~event.img_event) }}" />{% endif %}</li>
             {% endfor %}
             </ul>
         {% endif %}
