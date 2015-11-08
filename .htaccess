@@ -8,7 +8,7 @@
     #RewriteRule ^admin/(.*)$ admin/web/$1 [L,NC,R=302]
 
     # Imagenes y estilos
-    #RewriteRule ^img/(.*)$ web/img/$1 [L]
+    RewriteRule ^img/(.*)$ img/$1 [L]
     #RewriteRule ^js/(.*)$ web/js/$1 [L]
     RewriteRule ^css/(.*)$ css/$1 [L]
     #RewriteRule ^fonts/(.*)$ web/fonts/$1 [L]
