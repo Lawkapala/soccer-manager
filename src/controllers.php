@@ -194,6 +194,118 @@ $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
 ->bind('posiciones')
 ;
 
+$app->match('/admin/jugadores/form', function(Request $request) use ($app) {
+    //get positions to select in form
+    $positions = $app['db']->fetchAll('SELECT * FROM player_position');
+    $pos_choice = function() use ($positions) {
+        if (count($positions) == 0)
+            return array();
+
+        $pos = array();
+        foreach($positions as $position) {
+            $pos[$position['id']] = $position['name'];
+        }
+        return $pos;
+    };
+
+    //get teams to select in form
+    $teams = $app['db']->fetchAll('SELECT * FROM team');
+    $team_choice = function() use ($teams) {
+        if (count($teams) == 0)
+            return array();
+
+        $t = array();
+        foreach($teams as $team) {
+            $t[$team['id']] = $team['name'];
+        }
+        return $t;
+    };
+
+    //create form
+    $form = $app['form.factory']->createBuilder('form')
+        ->add(
+            'name', 'text',
+            array('label' => 'Nombre')
+        )
+        ->add(
+            'alias', 'text',
+            array(
+                'label' => 'Alias',
+                'required' => false
+            )
+        )
+        ->add(
+            'position', 'choice',
+            array(
+                'label' => 'Posición',
+                'choices' => $pos_choice()
+            )
+        )
+        ->add(
+            'number', 'text',
+            array(
+                'label' => 'Dorsal',
+                'required' => false
+            )
+        )
+        ->add(
+            'team', 'choice',
+            array(
+                'label' => 'Equipo',
+                'choices' => $team_choice()
+            )
+        )
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    //handle form request
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+
+        echo "<pre>";print_r($data);echo "</pre>";
+
+        $fields = array();
+
+        if (isset($data['name']) && !empty($data['name'])) {
+            $fields['name'] = $data['name'];
+        }
+
+        if (isset($data['alias']) && !empty($data['alias'])) {
+            $fields['alias'] = $data['alias'];
+        }
+
+        if (isset($data['position']) && !empty($data['position'])) {
+            $fields['position_id'] = $data['position'];
+        }
+
+        if (isset($data['number']) && !empty($data['number'])) {
+            $fields['num_player'] = $data['number'];
+        }
+
+        if (isset($data['team']) && !empty($data['team'])) {
+            $fields['team_id'] = $data['team'];
+        }
+
+        $app['db']->insert('player', $fields);
+
+        $app->redirect($app['url_generator']->generate('jugadores'));
+    }
+
+    //get all players saved in DB
+    $players = $app['db']->fetchAll('SELECT * FROM player');
+
+    return $app['twig']
+        ->render('admin/players.html.twig',
+            array(
+                'players'            =>  $players,
+                'form'              =>  $form->createView()
+            )
+        );
+})
+->bind('jugadores')
+;
+
 $app->match('/admin/equipos/form', function(Request $request) use ($app) {
     //get all images saved
     $basePath = __DIR__.'/../web/img/teams/';
@@ -240,7 +352,6 @@ $app->match('/admin/equipos/form', function(Request $request) use ($app) {
         $data = $form->getData();
 
         $fields = array();
-        echo "<pre>";print_r($data);echo "</pre>";
 
         if (isset($data['name']) && !empty($data['name'])) {
             $fields['name'] = $data['name'];
@@ -279,7 +390,7 @@ $app->match('/admin/equipos/form', function(Request $request) use ($app) {
 $app->error(function (\Exception $e, $code) use ($app) {
     if ($app['debug']) {
         var_dump(array($e->getMessage(),$code));
-       // return;
+//        return;
     }
 
     // 404.html, or 40x.html, or 4xx.html, or error.html

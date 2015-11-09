@@ -1,0 +1,77 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    <div>
+        ADMIN :: players
+    </div>
+
+    <br />
+
+    <div>
+        {#AVAILABLE IMG FOR EVENTS :: <br />
+
+        {% for imgFile,imgName in availableImages %}
+            <span>
+                <img src="{{ asset(eventImgPath~imgFile) }}" title="{{ imgName }}" /> {{ imgName }}
+            </span>
+        {% endfor %}
+
+        <br /><br />#}
+
+        PLAYERS ALREADY CONFIGURED :: {{ players|length }}<br />
+
+        {% if players|length > 0 %}
+            <ul>
+            {% for player in players %}
+                {#<li>{{ player.name }} :: {% if player.img_player %}<img src="{{ asset(playerImgPath~player.img_player) }}" />{% endif %}</li>#}
+                <li>
+                {% for k,v in player %}
+                    <strong>{{ k|upper }}</strong> :: {{ (k == 'position_id' or k == 'team_id') ? getString(v,k) : v }} ||
+                {% endfor %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br />
+
+    <form action="" method="post">
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+
+        <div>
+            {{ form_label(form.name) }}
+            {{ form_errors(form.name) }}
+            {{ form_widget(form.name) }}
+        </div>
+
+        <div>
+            {{ form_label(form.alias) }}
+            {{ form_errors(form.alias) }}
+            {{ form_widget(form.alias) }}
+        </div>
+
+        <div>
+            {{ form_label(form.position) }}
+            {{ form_errors(form.position) }}
+            {{ form_widget(form.position) }}
+        </div>
+
+        <div>
+            {{ form_label(form.number) }}
+            {{ form_errors(form.number) }}
+            {{ form_widget(form.number) }}
+        </div>
+
+        <div>
+            {{ form_label(form.team) }}
+            {{ form_errors(form.team) }}
+            {{ form_widget(form.team) }}
+        </div>
+
+        <br />
+
+        <input type="submit" name="submit" value="Enviar" />
+    </form>
+{% endblock %}
