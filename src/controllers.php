@@ -132,7 +132,7 @@ $app->match('/admin/eventos', function(Request $request) use ($app) {
 ->bind('eventos')
 ;
 
-$app->match('/admin/jornadas/form', function(Request $request) use ($app) {
+$app->match('/admin/jornadas', function(Request $request) use ($app) {
     $data = array('name'=>'');
 
     $form = $app['form.factory']->createBuilder('form',$data)
@@ -163,7 +163,7 @@ $app->match('/admin/jornadas/form', function(Request $request) use ($app) {
 ->bind('jornadas')
 ;
 
-$app->match('/admin/posiciones/form', function(Request $request) use ($app) {
+$app->match('/admin/posiciones', function(Request $request) use ($app) {
     $data = array('name'=>'');
 
     $form = $app['form.factory']->createBuilder('form',$data)
@@ -194,7 +194,7 @@ $app->match('/admin/posiciones/form', function(Request $request) use ($app) {
 ->bind('posiciones')
 ;
 
-$app->match('/admin/jugadores/form', function(Request $request) use ($app) {
+$app->match('/admin/jugadores', function(Request $request) use ($app) {
     //get positions to select in form
     $positions = $app['db']->fetchAll('SELECT * FROM player_position');
     $pos_choice = function() use ($positions) {
@@ -306,7 +306,7 @@ $app->match('/admin/jugadores/form', function(Request $request) use ($app) {
 ->bind('jugadores')
 ;
 
-$app->match('/admin/equipos/form', function(Request $request) use ($app) {
+$app->match('/admin/equipos', function(Request $request) use ($app) {
     //get all images saved
     $basePath = __DIR__.'/../web/img/teams/';
     $img_choices = array();
