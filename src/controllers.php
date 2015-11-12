@@ -66,7 +66,7 @@ $app->get('/admin', function() use ($app) {
 $app->match('/admin/eventos', function(Request $request) use ($app) {
     $data = array('name'=>'');
 
-    //get all images saved
+    // get all images saved
     $basePath = __DIR__.'/../web/img/events/';
     $img_choices = array();
 
@@ -77,7 +77,7 @@ $app->match('/admin/eventos', function(Request $request) use ($app) {
         $img_choices[$fullName] = $name;
     }
 
-    //create form
+    // create form
     $form = $app['form.factory']->createBuilder('form',$data)
         ->add(
             'name', 'text',
@@ -97,7 +97,7 @@ $app->match('/admin/eventos', function(Request $request) use ($app) {
 
     $form->handleRequest($request);
 
-    //handle form request
+    // handle form request
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
 
@@ -111,14 +111,14 @@ $app->match('/admin/eventos', function(Request $request) use ($app) {
             $fields['img_event'] = $data['image'];
         }
 
-        $app['db']->insert('event', $fields);
+        $app['db']->insert('f7_event', $fields);
 
         return $app->redirect($app['url_generator']->generate('eventos'));
 
     }
 
-    //get all events saved in DB
-    $events = $app['db']->fetchAll('SELECT * FROM event');
+    // get all events saved in DB
+    $events = $app['db']->fetchAll('SELECT * FROM f7_event');
 
     return $app['twig']
         ->render('admin/event.html.twig',
@@ -148,19 +148,147 @@ $app->match('/admin/jornadas', function(Request $request) use ($app) {
         $data = $form->getData();
 
         if (isset($data['name']) && !empty($data['name'])) {
-            $app['db']->insert('matchday', array('name'=>$data['name']));
+            $app['db']->insert('f7_matchday', array('name'=>$data['name']));
 
             return $app->redirect($app['url_generator']->generate('jornadas'));
         }
     }
 
     // get all positions saved in DB
-    $matchdays = $app['db']->fetchAll('SELECT * FROM matchday');
+    $matchdays = $app['db']->fetchAll('SELECT * FROM f7_matchday');
 
 
     return $app['twig']->render('admin/matchdays.html.twig', array('matchdays'=>$matchdays,'form'=>$form->createView()));
 })
 ->bind('jornadas')
+;
+
+$app->match('/admin/partidos', function(Request $request) use ($app) {
+    // get matchdays to select in form
+    $matchdays = $app['db']->fetchAll('SELECT * FROM f7_matchday');
+    $matchdays_choice = function() use ($matchdays) {
+        if (count($matchdays) == 0)
+            return array();
+
+        $m = array();
+        foreach($matchdays as $matchday) {
+            $m[$matchday['id']] = $matchday['name'];
+        }
+        return $m;
+    };
+
+    // get teams to select in form
+    $teams = $app['db']->fetchAll('SELECT * FROM f7_team');
+    $team_choice = function() use ($teams) {
+        if (count($teams) == 0)
+            return array();
+
+        $t = array();
+        foreach($teams as $team) {
+            $t[$team['id']] = $team['name'];
+        }
+        return $t;
+    };
+
+    $form = $app['form.factory']->createBuilder('form',array())
+        ->add(
+            'matchday_id', 'choice',
+            array(
+                'label' => 'Jornada',
+                'choices' => $matchdays_choice(),
+                'expanded' => false,
+                'multiple' => false
+            )
+        )
+        ->add(
+            'home_team', 'choice',
+            array(
+                'label' => 'Equipo local',
+                'choices' => $team_choice(),
+                'expanded' => false,
+                'multiple' => false
+            )
+        )
+        ->add(
+            'score_home_team', 'text',
+            array(
+                'label' => 'Goles',
+                'required' => false
+            )
+        )
+        ->add(
+            'away_team', 'choice',
+            array(
+                'label' => 'Equipo visitante',
+                'choices' => $team_choice(),
+                'expanded' => false,
+                'multiple' => false
+            )
+        )
+        ->add(
+            'score_away_team', 'text',
+            array(
+                'label' => 'Goles',
+                'required' => false
+            )
+        )
+        ->add(
+            'location', 'text',
+            array(
+                'label' => 'Campo',
+                'required' => false
+            )
+        )
+        ->add(
+            'played', 'choice',
+            array(
+                'label' => 'Jugado?',
+                'choices' => array(0=>'No', 1=>'Si'),
+                'expanded' => false,
+                'multiple' => false
+            )
+        )
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+
+        echo "<pre>";print_r($data);echo "</pre>";
+        $app['db']->insert('f7_match', $data);
+
+        return $app->redirect($app['url_generator']->generate('partidos'));
+    }
+
+    // get all matchs saved in DB
+    $matchs = $app['db']->fetchAll('SELECT * FROM f7_match');
+
+
+    return $app['twig']
+        ->render('admin/match.html.twig',
+            array(
+                'matchdays' => $matchdays_choice,
+                'team_choice' => $team_choice,
+                'matchs'    => $matchs,
+                'form'  => $form->createView()
+            )
+        );
+})
+->bind('partidos')
+;
+
+$app->match('/admin/partido/{matchId}', function($matchId) use ($app) {
+    // get match
+
+    return $app['twig']
+        ->render('admin/match_detail.html.twig',
+            array(
+                'matchId' => $matchId
+            )
+        );
+})
+->bind('detalle_partido')
 ;
 
 $app->match('/admin/posiciones', function(Request $request) use ($app) {
@@ -179,14 +307,14 @@ $app->match('/admin/posiciones', function(Request $request) use ($app) {
         $data = $form->getData();
 
         if (isset($data['name']) && !empty($data['name'])) {
-            $app['db']->insert('player_position', array('name'=>$data['name']));
+            $app['db']->insert('f7_player_position', array('name'=>$data['name']));
 
             return $app->redirect($app['url_generator']->generate('posiciones'));
         }
     }
 
     // get all positions saved in DB
-    $positions = $app['db']->fetchAll('SELECT * FROM player_position');
+    $positions = $app['db']->fetchAll('SELECT * FROM f7_player_position');
 
 
     return $app['twig']->render('admin/position.html.twig', array('positions'=>$positions,'form'=>$form->createView()));
@@ -195,8 +323,8 @@ $app->match('/admin/posiciones', function(Request $request) use ($app) {
 ;
 
 $app->match('/admin/jugadores', function(Request $request) use ($app) {
-    //get positions to select in form
-    $positions = $app['db']->fetchAll('SELECT * FROM player_position');
+    // get positions to select in form
+    $positions = $app['db']->fetchAll('SELECT * FROM f7_player_position');
     $pos_choice = function() use ($positions) {
         if (count($positions) == 0)
             return array();
@@ -208,8 +336,8 @@ $app->match('/admin/jugadores', function(Request $request) use ($app) {
         return $pos;
     };
 
-    //get teams to select in form
-    $teams = $app['db']->fetchAll('SELECT * FROM team');
+    // get teams to select in form
+    $teams = $app['db']->fetchAll('SELECT * FROM f7_team');
     $team_choice = function() use ($teams) {
         if (count($teams) == 0)
             return array();
@@ -221,7 +349,7 @@ $app->match('/admin/jugadores', function(Request $request) use ($app) {
         return $t;
     };
 
-    //create form
+    // create form
     $form = $app['form.factory']->createBuilder('form')
         ->add(
             'name', 'text',
@@ -259,11 +387,9 @@ $app->match('/admin/jugadores', function(Request $request) use ($app) {
 
     $form->handleRequest($request);
 
-    //handle form request
+    // handle form request
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
-
-        echo "<pre>";print_r($data);echo "</pre>";
 
         $fields = array();
 
@@ -287,13 +413,13 @@ $app->match('/admin/jugadores', function(Request $request) use ($app) {
             $fields['team_id'] = $data['team'];
         }
 
-        $app['db']->insert('player', $fields);
+        $app['db']->insert('f7_player', $fields);
 
         $app->redirect($app['url_generator']->generate('jugadores'));
     }
 
-    //get all players saved in DB
-    $players = $app['db']->fetchAll('SELECT * FROM player');
+    // get all players saved in DB
+    $players = $app['db']->fetchAll('SELECT * FROM f7_player');
 
     return $app['twig']
         ->render('admin/players.html.twig',
@@ -307,7 +433,7 @@ $app->match('/admin/jugadores', function(Request $request) use ($app) {
 ;
 
 $app->match('/admin/equipos', function(Request $request) use ($app) {
-    //get all images saved
+    // get all images saved
     $basePath = __DIR__.'/../web/img/teams/';
     $img_choices = array();
 
@@ -318,7 +444,7 @@ $app->match('/admin/equipos', function(Request $request) use ($app) {
         $img_choices[$fullName] = $name;
     }
 
-    //create form
+    // create form
     $form = $app['form.factory']->createBuilder('form')
         ->add(
             'name', 'text',
@@ -347,7 +473,7 @@ $app->match('/admin/equipos', function(Request $request) use ($app) {
 
     $form->handleRequest($request);
 
-    //handle form request
+    // handle form request
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
 
@@ -365,14 +491,14 @@ $app->match('/admin/equipos', function(Request $request) use ($app) {
             $fields['user_team'] = $data['webTeam'];
         }
 
-        $app['db']->insert('team', $fields);
+        $app['db']->insert('f7_team', $fields);
 
         return $app->redirect($app['url_generator']->generate('equipos'));
 
     }
 
-    //get all events saved in DB
-    $teams = $app['db']->fetchAll('SELECT * FROM team');
+    // get all events saved in DB
+    $teams = $app['db']->fetchAll('SELECT * FROM f7_team');
 
     return $app['twig']
         ->render('admin/teams.html.twig',

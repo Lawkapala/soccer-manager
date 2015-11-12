@@ -1,0 +1,78 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    <div>
+        ADMIN :: match
+    </div>
+
+    <br />
+
+    <div>
+        MATCHS ALREADY CONFIGURED :: {{ matchs|length }}<br />
+
+        {% if matchs|length > 0 %}
+            <ul>
+            {% for match in matchs %}
+                <li>{{  match.matchday_id }} #
+                    {{ getString(match.home_team,'team_id') }} [{{ match.score_home_team }}] : [{{ match.score_away_team }}] {{ getString(match.away_team,'team_id') }} #
+                    Campo: {{ match.location }} #
+                    Jugado: {{ (match.played)?'si':'no' }} # {<a href="{{ app.url_generator.generate('detalle_partido',{'matchId':match.id}) }}">add details</a>}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <br />
+
+    <form action="" method="post">
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+
+        <div>
+            {{ form_label(form.matchday_id) }}
+            {{ form_errors(form.matchday_id) }}
+            {{ form_widget(form.matchday_id) }}
+        </div>
+
+        <div>
+            {{ form_label(form.home_team) }}
+            {{ form_errors(form.home_team) }}
+            {{ form_widget(form.home_team) }}
+        </div>
+
+        <div>
+            {{ form_label(form.score_home_team) }}
+            {{ form_errors(form.score_home_team) }}
+            {{ form_widget(form.score_home_team) }}
+        </div>
+
+        <div>
+            {{ form_label(form.score_away_team) }}
+            {{ form_errors(form.score_away_team) }}
+            {{ form_widget(form.score_away_team) }}
+        </div>
+
+        <div>
+            {{ form_label(form.away_team) }}
+            {{ form_errors(form.away_team) }}
+            {{ form_widget(form.away_team) }}
+        </div>
+
+        <div>
+            {{ form_label(form.location) }}
+            {{ form_errors(form.location) }}
+            {{ form_widget(form.location) }}
+        </div>
+
+        <div>
+            {{ form_label(form.played) }}
+            {{ form_errors(form.played) }}
+            {{ form_widget(form.played) }}
+        </div>
+
+        <br />
+
+        <input type="submit" name="submit" value="Enviar" />
+    </form>
+{% endblock %}

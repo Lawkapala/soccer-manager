@@ -33,9 +33,9 @@ $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
 
     $twig->addFunction(new \Twig_SimpleFunction('getString', function ($value, $type) use ($app) {
         if ($type == 'position_id') {
-            $toString = $app['db']->fetchAssoc('SELECT * FROM player_position WHERE id = ?', array($value));
+            $toString = $app['db']->fetchAssoc('SELECT * FROM f7_player_position WHERE id = ?', array($value));
         } elseif ($type == 'team_id') {
-            $toString = $app['db']->fetchAssoc('SELECT * FROM team WHERE id = ?', array($value));
+            $toString = $app['db']->fetchAssoc('SELECT * FROM f7_team WHERE id = ?', array($value));
         }
 
         if (isset($toString)) {
