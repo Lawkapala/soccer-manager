@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+
 //Request::setTrustedProxies(array('127.0.0.1'));
 
 /**
@@ -190,7 +191,7 @@ $app->match('/admin/partidos', function(Request $request) use ($app) {
         return $t;
     };
 
-    $form = $app['form.factory']->createBuilder('form',array())
+    $form = $app['form.factory']->createBuilder('form')
         ->add(
             'matchday_id', 'choice',
             array(
@@ -278,13 +279,133 @@ $app->match('/admin/partidos', function(Request $request) use ($app) {
 ->bind('partidos')
 ;
 
-$app->match('/admin/partido/{matchId}', function($matchId) use ($app) {
-    // get match
+$app->match('/admin/partido/{matchId}', function($matchId, Request $request) use ($app) {
+    // get match from DB
+    $match = $app['db']->fetchAssoc('SELECT * FROM f7_match WHERE id = ?', array(intval($matchId)));
+echo "<pre>MATCH :: ";print_r($match);echo "</pre>";
+    // if match exist, get player and events to add at match
+    if ($match) {
+        $home_players = $app['db']->fetchAll('SELECT * FROM f7_player WHERE team_id = ?', array(intval($match['home_team'])));
+        if ($home_players) {
+            $home_players_choice = function() use ($app,$home_players) {
+                if (count($home_players) == 0)
+                    return array();
+
+                $p = array();
+                foreach($home_players as $idx=>$player) {
+                    $p[$player['id']] = $player['name'];
+                }
+                return $p;
+            };
+        }
+
+        $away_players = $app['db']->fetchAll('SELECT * FROM f7_player WHERE team_id = ?', array(intval($match['away_team'])));
+        if ($away_players) {
+            $away_players_choice = function() use ($away_players) {
+                if (count($away_players) == 0)
+                    return array();
+
+                $p = array();
+                foreach($away_players as $player) {
+                    $p[$player['id']] = $player['name'];
+                }
+                return $p;
+            };
+        }
+
+        $events = $app['db']->fetchAll('SELECT * FROM f7_event');
+        if ($events) {
+            $event_choice = function() use ($events) {
+                if (count($events) == 0)
+                    return array();
+
+                $e = array();
+                foreach($events as $event) {
+                    $e[$event['id']] = $event['name'];
+                }
+                return $e;
+            };
+        }
+
+        $local = $app['db']->fetchAssoc('SELECT * FROM f7_team WHERE id = ?', array(intval($match['home_team'])));
+        $away = $app['db']->fetchAssoc('SELECT * FROM f7_team WHERE id = ?', array(intval($match['away_team'])));
+
+        $players = array();
+        $players[$local['name']] = ($home_players)?$home_players_choice():array();
+        $players[$away['name']] = ($away_players)?$away_players_choice():array();
+echo "<pre>";print_r($players);echo "</pre>";
+
+        $form = $app['form.factory']->createBuilder('form',array('emails'=>array('qwe','asd','zxc')))
+            ->add(
+                'home_players', 'choice',
+                array(
+                    'label' => 'Jugadores Locales',
+                    'choices' => ($home_players)?$home_players_choice():array(),
+                    'expanded' => true,
+                    'multiple' => true
+                )
+            )
+            ->add(
+                'away_players', 'choice',
+                array(
+                    'label' => 'Jugadores Visitantes',
+                    'choices' => ($away_players)?$away_players_choice():array(),
+                    'expanded' => true,
+                    'multiple' => true
+                )
+            )
+            ->add(
+                'events', 'choice',
+                array(
+                    'label' => 'Eventos de jugador',
+                    'choices' => ($event_choice)?$event_choice():array(),
+                    'expanded' => false,
+                    'multiple' => false
+                )
+            )
+            ->add(
+                'players', 'choice',
+                array(
+                    'label' => 'Jugadores',
+                    'choices' => array($players),
+                    'expanded' => false,
+                    'multiple' => false
+                )
+            )
+//            ->add(
+//                'email', 'text',
+//                array(
+//                    'label' => 'correo',
+//                    'required' => false
+//                )
+//            )
+        ->add('emails', 'collection', array(
+            'label' => 'emilios',
+            // each item in the array will be an "email" field
+            'type'   => 'text',
+            // these options are passed to each "email" type
+            'options'  => array(
+                'required'  => false
+            )
+        ))
+            ->getForm();
+    }
+
+    $form->handleRequest($request);
+
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+
+        echo "<pre>HANDLE REQUEST :: ";print_r($data);echo "</pre>";
+    }
 
     return $app['twig']
         ->render('admin/match_detail.html.twig',
             array(
-                'matchId' => $matchId
+                'matchId' => $matchId,
+                'match' => ($match)?:false,
+                'home_players' => ($home_players)?:false,
+                'form' => ($form)?$form->createView():false
             )
         );
 })
