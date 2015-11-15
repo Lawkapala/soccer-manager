@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+use Fut7\Form\Type\MatchPlayerEventType;
+
 
 //Request::setTrustedProxies(array('127.0.0.1'));
 
@@ -335,7 +337,7 @@ echo "<pre>MATCH :: ";print_r($match);echo "</pre>";
         $players[$away['name']] = ($away_players)?$away_players_choice():array();
 echo "<pre>";print_r($players);echo "</pre>";
 
-        $form = $app['form.factory']->createBuilder('form',array('emails'=>array('qwe','asd','zxc')))
+        $form = $app['form.factory']->createBuilder('form')
             ->add(
                 'home_players', 'choice',
                 array(
@@ -398,7 +400,7 @@ echo "<pre>";print_r($players);echo "</pre>";
 
         echo "<pre>HANDLE REQUEST :: ";print_r($data);echo "</pre>";
     }
-
+$f2 = $app['form.factory']->createForm(new MatchPlayerEventType());
     return $app['twig']
         ->render('admin/match_detail.html.twig',
             array(
@@ -406,6 +408,7 @@ echo "<pre>";print_r($players);echo "</pre>";
                 'match' => ($match)?:false,
                 'home_players' => ($home_players)?:false,
                 'form' => ($form)?$form->createView():false
+                ,'f2'=>$f2->createView()
             )
         );
 })

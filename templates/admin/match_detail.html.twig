@@ -55,16 +55,12 @@
                 </div>
 
                 <div>
-                    {#{{ form_label(form.email) }}#}
-                    {#{{ form_errors(form.email) }}#}
-                    {#{{ form_widget(form.email) }}#}
-
                     {{ form_label(form.emails) }}
                     <ul>
-                        {% for emailField in form.emails %}
+                        {% for emailfield in form.emails %}
                             <li>
-                                {{ form_errors(emailField) }}
-                                {{ form_widget(emailField) }}
+                                {{ form_errors(emailfield) }}
+                                {{ form_widget(emailfield) }}
                             </li>
                         {% endfor %}
                     </ul>
@@ -78,6 +74,10 @@
     {% endif %}
 
     <a href="{{ app.url_generator.generate('partidos') }}">Volver a Partidos</a><br />
+
+    {{ form_start(f2) }}
+    {{ form_widget(f2) }}
+    {{ form_end(f2) }}
 
 
 {% endblock %}
