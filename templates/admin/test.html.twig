@@ -1,0 +1,33 @@
+<h3>Test form field type</h3>
+{#{{ form_start(f2) }}#}
+    {#{{ form_errors(f2) }}#}
+
+    {#{{ form_row(f2.test) }}#}
+{#{{ form_end(f2) }}#}
+
+<form action="" method="post">
+    {{ form_errors(f2) }}
+    {{ form_widget(f2._token) }}
+
+    <div>
+        {{ form_row(f2.test) }}
+    </div>
+
+    <div>
+        {{ form_row(f2.test2) }}
+    </div>
+
+    <br />
+
+    <input type="submit" name="submit" value="Enviar" />
+</form>
+
+<h3>Test form field type v2</h3>
+<form action="" method="post">
+    {{ form_errors(f3) }}
+    {{ form_widget(f3) }}
+
+    <br />
+
+    <input type="submit" name="submit" value="Enviar" />
+</form>
