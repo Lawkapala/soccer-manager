@@ -2,7 +2,8 @@
 SQLyog Ultimate v9.51 
 MySQL - 5.6.16 : Database - sx_fut7
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -122,11 +123,11 @@ CREATE TABLE `f7_player_position` (
 
 insert  into `f7_player_position`(`id`,`name`) values (1,'portero'),(2,'defensa'),(3,'defensa-medio'),(4,'medio'),(5,'medio-delantero'),(6,'delantero'),(7,'fty');
 
-/*Table structure for table `f7_squard` */
+/*Table structure for table `f7_squad` */
 
-DROP TABLE IF EXISTS `f7_squard`;
+DROP TABLE IF EXISTS `f7_squad`;
 
-CREATE TABLE `f7_squard` (
+CREATE TABLE `f7_squad` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `match_id` int(11) DEFAULT NULL,
   `team_id` int(11) DEFAULT NULL,
@@ -135,12 +136,12 @@ CREATE TABLE `f7_squard` (
   KEY `match_id` (`match_id`),
   KEY `team_id` (`team_id`),
   KEY `player_id` (`player_id`),
-  CONSTRAINT `f7_squard_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `f7_match` (`id`),
-  CONSTRAINT `f7_squard_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `f7_team` (`id`),
-  CONSTRAINT `f7_squard_ibfk_3` FOREIGN KEY (`player_id`) REFERENCES `f7_player` (`id`)
+  CONSTRAINT `f7_squad_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `f7_match` (`id`),
+  CONSTRAINT `f7_squad_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `f7_team` (`id`),
+  CONSTRAINT `f7_squad_ibfk_3` FOREIGN KEY (`player_id`) REFERENCES `f7_player` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Data for the table `f7_squard` */
+/*Data for the table `f7_squad` */
 
 /*Table structure for table `f7_team` */
 
