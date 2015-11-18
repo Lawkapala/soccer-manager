@@ -25,6 +25,32 @@
             </ul>
         </div>
 
+        <div>
+            MATCH :: HOME SQUAD :: {{ home_squad|length }}<br />
+            <ul>
+            {% if home_squad is iterable and home_squad  %}
+                {% for player in home_squad %}
+                    <li>Player {{ loop.index }}: {{ getString(player.player_id,'player_id') }}</li>
+                {% endfor %}
+            {% else %}
+                <li>NO HOME PLAYERS SAVED</li>
+            {% endif %}
+            </ul>
+        </div>
+
+        <div>
+            MATCH :: AWAY SQUAD :: {{ away_squad|length }}<br />
+            <ul>
+            {% if away_squad is iterable and away_squad  %}
+                {% for player in away_squad %}
+                    <li>Player {{ loop.index }}: {{ getString(player.player_id,'player_id') }}</li>
+                {% endfor %}
+            {% else %}
+                <li>NO AWAY PLAYERS SAVED</li>
+            {% endif %}
+            </ul>
+        </div>
+
         {% if form %}
             <form action="" method="post">
                 {{ form_errors(form) }}
@@ -42,42 +68,19 @@
                     {{ form_widget(form.away_players) }}
                 </div>
 
-                <div>
-                    {{ form_label(form.events) }}
-                    {{ form_errors(form.events) }}
-                    {{ form_widget(form.events) }}
-                </div>
-
-                <div>
-                    {{ form_label(form.players) }}
-                    {{ form_errors(form.players) }}
-                    {{ form_widget(form.players) }}
-                </div>
-
-                <div>
-                    {{ form_label(form.emails) }}
-                    <ul>
-                        {% for emailfield in form.emails %}
-                            <li>
-                                {{ form_errors(emailfield) }}
-                                {{ form_widget(emailfield) }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
                 <br />
 
-                <input type="submit" name="submit" value="Enviar" />
-            </form>
+                <input type="submit" name="submit" value="Enviar Form" />
+            </form><br />
         {% endif %}
     {% endif %}
 
     <a href="{{ app.url_generator.generate('partidos') }}">Volver a Partidos</a><br />
 
-    {{ form_start(f2) }}
-    {{ form_widget(f2) }}
-    {{ form_end(f2) }}
+{% endblock %}
 
-
+{% block footer_js %}
+    <script type="text/javascript">
+        $( document ).ready(function() {});
+    </script>
 {% endblock %}

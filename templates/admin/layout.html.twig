@@ -4,7 +4,7 @@
         <title>{% block title '' %} - My Admin Silex Application</title>
 
         <link href="{{ asset('css/admin/main.css') }}" rel="stylesheet" type="text/css" />
-
+        <script type="text/javascript" src="{{ asset('js/vendor/jquery-1.11.3.min.js') }}"></script>
     </head>
     <body>
         <div class="content">
@@ -19,5 +19,6 @@
                 <a href="{{ app.url_generator.generate('homepage') }}">Home[Front]</a>
             </div>
         </div>
+        {% block footer_js %}{% endblock %}
     </body>
 </html>

@@ -14,19 +14,26 @@ use Symfony\Component\Form\FormBuilderInterface;
 class TestFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
-    {
+    {echo "<pre>FORM OPTIONS :: ";print_r($options);echo "</pre>";
         $builder->add(
             'player', 'choice',
             array(
-                'label'=>'players',
-                'choices' => array(1 => 'player1', 2 => 'player2')
+                'label' => 'Jugadores',
+                'choices' => $options['data'][0]
             )
         )
         ->add(
             'event', 'choice',
             array(
-                'label'=>'events',
-                'choices' => array(1 => 'event1', 2 => 'female'),
+                'label' => 'Eventos',
+                'choices' => $options['data'][1],
+            )
+        )
+        ->add(
+            'acount', 'text',
+            array(
+                'label' => 'Cantidad',
+                'data'  => 1
             )
         );
     }

@@ -6,9 +6,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-use Fut7\Form\Type\MatchPlayerEventType;
-
-
 //Request::setTrustedProxies(array('127.0.0.1'));
 
 /**
@@ -284,9 +281,11 @@ $app->match('/admin/partidos', function(Request $request) use ($app) {
 $app->match('/admin/partido/{matchId}', function($matchId, Request $request) use ($app) {
     // get match from DB
     $match = $app['db']->fetchAssoc('SELECT * FROM f7_match WHERE id = ?', array(intval($matchId)));
-echo "<pre>MATCH :: ";print_r($match);echo "</pre>";
-    // if match exist, get player and events to add at match
+
+    // if match exist, get players to add at match
     if ($match) {
+        $home_squad = $app['db']->fetchAll('SELECT * FROM f7_squad WHERE team_id = ? AND match_id = ?', array(intval($match['home_team']), intval($matchId)));
+
         $home_players = $app['db']->fetchAll('SELECT * FROM f7_player WHERE team_id = ?', array(intval($match['home_team'])));
         if ($home_players) {
             $home_players_choice = function() use ($app,$home_players) {
@@ -300,6 +299,8 @@ echo "<pre>MATCH :: ";print_r($match);echo "</pre>";
                 return $p;
             };
         }
+
+        $away_squad = $app['db']->fetchAll('SELECT * FROM f7_squad WHERE team_id = ? AND match_id = ?', array(intval($match['away_team']), intval($matchId)));
 
         $away_players = $app['db']->fetchAll('SELECT * FROM f7_player WHERE team_id = ?', array(intval($match['away_team'])));
         if ($away_players) {
@@ -329,14 +330,6 @@ echo "<pre>MATCH :: ";print_r($match);echo "</pre>";
             };
         }
 
-        $local = $app['db']->fetchAssoc('SELECT * FROM f7_team WHERE id = ?', array(intval($match['home_team'])));
-        $away = $app['db']->fetchAssoc('SELECT * FROM f7_team WHERE id = ?', array(intval($match['away_team'])));
-
-        $players = array();
-        $players[$local['name']] = ($home_players)?$home_players_choice():array();
-        $players[$away['name']] = ($away_players)?$away_players_choice():array();
-echo "<pre>";print_r($players);echo "</pre>";
-
         $form = $app['form.factory']->createBuilder('form')
             ->add(
                 'home_players', 'choice',
@@ -356,40 +349,6 @@ echo "<pre>";print_r($players);echo "</pre>";
                     'multiple' => true
                 )
             )
-            ->add(
-                'events', 'choice',
-                array(
-                    'label' => 'Eventos de jugador',
-                    'choices' => ($event_choice)?$event_choice():array(),
-                    'expanded' => false,
-                    'multiple' => false
-                )
-            )
-            ->add(
-                'players', 'choice',
-                array(
-                    'label' => 'Jugadores',
-                    'choices' => array($players),
-                    'expanded' => false,
-                    'multiple' => false
-                )
-            )
-//            ->add(
-//                'email', 'text',
-//                array(
-//                    'label' => 'correo',
-//                    'required' => false
-//                )
-//            )
-        ->add('emails', 'collection', array(
-            'label' => 'emilios',
-            // each item in the array will be an "email" field
-            'type'   => 'text',
-            // these options are passed to each "email" type
-            'options'  => array(
-                'required'  => false
-            )
-        ))
             ->getForm();
     }
 
@@ -398,17 +357,34 @@ echo "<pre>";print_r($players);echo "</pre>";
     if ($form->isValid() && $form->isSubmitted()) {
         $data = $form->getData();
 
-        echo "<pre>HANDLE REQUEST :: ";print_r($data);echo "</pre>";
+        // save squads of match
+        if (!empty($data['home_players'])) {
+            $app['db']->delete('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team']));
+
+            foreach($data['home_players'] as $squad) {
+                $app['db']->insert('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team'], 'player_id'=>$squad));
+            }
+        }
+
+        if (!empty($data['away_players'])) {
+            $app['db']->delete('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team']));
+
+            foreach($data['away_players'] as $squad) {
+                $app['db']->insert('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team'], 'player_id'=>$squad));
+            }
+        }
+
+        return $app->redirect($app['url_generator']->generate('detalle_partido',array('matchId'=>$matchId)));
     }
-$f2 = $app['form.factory']->createForm(new MatchPlayerEventType());
+
     return $app['twig']
         ->render('admin/match_detail.html.twig',
             array(
                 'matchId' => $matchId,
                 'match' => ($match)?:false,
-                'home_players' => ($home_players)?:false,
+                'home_squad' => ($home_squad)?:false,
+                'away_squad' => ($away_squad)?:false,
                 'form' => ($form)?$form->createView():false
-                ,'f2'=>$f2->createView()
             )
         );
 })
