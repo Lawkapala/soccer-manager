@@ -1,0 +1,64 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    <div>
+        ADMIN :: edit match
+    </div>
+
+    <br />
+
+    <div>
+        EDIT MATCH :: {{ matchId }}<br />
+    </div>
+
+    <br />
+
+    {% if match %}
+        <div>
+            MATCH INFO :: <br />
+            <ul>
+                <li>{{  match.matchday_id }} #
+                    {{ getString(match.home_team,'team_id') }} [{{ match.score_home_team }}] : [{{ match.score_away_team }}] {{ getString(match.away_team,'team_id') }} #
+                    Campo: {{ match.location }} #
+                    Jugado: {{ (match.played)?'si':'no' }}
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            MATCH :: HOME EVENTS :: {{ home_events|length }}<br />
+            <ul>
+                {% if home_squad is iterable and home_squad  %}
+                    {% for player in home_squad %}
+                        <li>Player {{ loop.index }}: {{ getString(player.player_id,'player_id') }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>NO HOME PLAYERS SAVED</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div>
+            MATCH :: AWAY EVENTS :: {{ away_events|length }}<br />
+            <ul>
+                {% if away_squad is iterable and away_squad  %}
+                    {% for player in away_squad %}
+                        <li>Player {{ loop.index }}: {{ getString(player.player_id,'player_id') }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>NO AWAY PLAYERS SAVED</li>
+                {% endif %}
+            </ul>
+        </div>
+
+    {% endif %}
+
+    <a href="{{ app.url_generator.generate('partidos') }}">Volver a Partidos</a><br />
+
+{% endblock %}
+
+{% block footer_js %}
+    <script type="text/javascript">
+        $( document ).ready(function() {});
+    </script>
+{% endblock %}

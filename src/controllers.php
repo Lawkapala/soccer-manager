@@ -278,7 +278,7 @@ $app->match('/admin/partidos', function(Request $request) use ($app) {
 ->bind('partidos')
 ;
 
-$app->match('/admin/partido/{matchId}', function($matchId, Request $request) use ($app) {
+$app->match('/admin/partido/{matchId}/equipo', function($matchId, Request $request) use ($app) {
     // get match from DB
     $match = $app['db']->fetchAssoc('SELECT * FROM f7_match WHERE id = ?', array(intval($matchId)));
 
@@ -313,20 +313,6 @@ $app->match('/admin/partido/{matchId}', function($matchId, Request $request) use
                     $p[$player['id']] = $player['name'];
                 }
                 return $p;
-            };
-        }
-
-        $events = $app['db']->fetchAll('SELECT * FROM f7_event');
-        if ($events) {
-            $event_choice = function() use ($events) {
-                if (count($events) == 0)
-                    return array();
-
-                $e = array();
-                foreach($events as $event) {
-                    $e[$event['id']] = $event['name'];
-                }
-                return $e;
             };
         }
 
@@ -389,6 +375,38 @@ $app->match('/admin/partido/{matchId}', function($matchId, Request $request) use
         );
 })
 ->bind('detalle_partido')
+;
+
+$app->match('/admin/partido/{matchId}/eventos', function($matchId, Request $request) use ($app) {
+    // get match from DB
+    $match = $app['db']->fetchAssoc('SELECT * FROM f7_match WHERE id = ?', array(intval($matchId)));
+
+    // if match exist, get events to add at match
+    if ($match) {
+        $events = $app['db']->fetchAll('SELECT * FROM f7_event');
+        if ($events) {
+            $event_choice = function() use ($events) {
+                if (count($events) == 0)
+                    return array();
+
+                $e = array();
+                foreach($events as $event) {
+                    $e[$event['id']] = $event['name'];
+                }
+                return $e;
+            };
+        }
+    }
+
+    return $app['twig']
+        ->render('admin/match_events.html.twig',
+            array(
+                'matchId' => $matchId,
+                'match' => ($match)?:false
+            )
+        );
+})
+->bind('eventos_partido')
 ;
 
 $app->match('/admin/posiciones', function(Request $request) use ($app) {

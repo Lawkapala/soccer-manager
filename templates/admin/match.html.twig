@@ -16,7 +16,9 @@
                 <li>{{  match.matchday_id }} #
                     {{ getString(match.home_team,'team_id') }} [{{ match.score_home_team }}] : [{{ match.score_away_team }}] {{ getString(match.away_team,'team_id') }} #
                     Campo: {{ match.location }} #
-                    Jugado: {{ (match.played)?'si':'no' }} # {<a href="{{ app.url_generator.generate('detalle_partido',{'matchId':match.id}) }}">add details</a>}
+                    Jugado: {{ (match.played)?'si':'no' }} #
+                    {<a href="{{ app.url_generator.generate('detalle_partido',{'matchId':match.id}) }}">squad</a>} #
+                    {<a href="{{ app.url_generator.generate('eventos_partido',{'matchId':match.id}) }}">events</a>}
                 </li>
             {% endfor %}
             </ul>
