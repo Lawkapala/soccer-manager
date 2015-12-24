@@ -38,6 +38,8 @@ $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
             $toString = $app['db']->fetchAssoc('SELECT * FROM f7_team WHERE id = ?', array($value));
         } elseif ($type == 'player_id') {
             $toString = $app['db']->fetchAssoc('SELECT * FROM f7_player WHERE id = ?', array($value));
+        } elseif ($type == 'event_id') {
+            $toString = $app['db']->fetchAssoc('SELECT * FROM f7_event WHERE id = ?', array($value));
         }
 
         if (isset($toString)) {

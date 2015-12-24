@@ -1,0 +1,79 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block content %}
+    <div>
+        ADMIN :: edit match
+    </div>
+
+    <br />
+
+    <div>
+        EDIT MATCH :: {{ matchId }}<br />
+    </div>
+
+    <br />
+
+    {% if match %}
+        <div>
+            MATCH INFO :: <br />
+            <ul>
+                <li>{{  match.matchday_id }} #
+                    {{ getString(match.home_team,'team_id') }} [{{ match.score_home_team }}] : [{{ match.score_away_team }}] {{ getString(match.away_team,'team_id') }} #
+                    Campo: {{ match.location }} #
+                    Jugado: {{ (match.played)?'si':'no' }}
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            MATCH :: EVENTS :: {{ match_events|length }}<br />
+            <ul>
+            {% if match_events is iterable and match_events  %}
+                {% for event in match_events %}
+                    <li>EventPlayer {{ loop.index }}: {{ getString(event.player_id,'player_id') }} # {{getString(event.event_id,'event_id') }} # {{ event.count }}</li>
+                {% endfor %}
+            {% else %}
+                <li>NO MATCH EVENTS SAVED</li>
+            {% endif %}
+            </ul>
+        </div>
+
+        {% if form %}
+            <form action="" method="post">
+                {{ form_errors(form) }}
+                {{ form_widget(form._token) }}
+
+                <div>
+                    {{ form_label(form.player) }}
+                    {{ form_errors(form.player) }}
+                    {{ form_widget(form.player) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.event) }}
+                    {{ form_errors(form.event) }}
+                    {{ form_widget(form.event) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.amount) }}
+                    {{ form_errors(form.amount) }}
+                    {{ form_widget(form.amount) }}
+                </div>
+
+                <br />
+
+                <input type="submit" name="submit" value="Enviar Form" />
+            </form><br />
+        {% endif %}
+    {% endif %}
+
+    <a href="{{ app.url_generator.generate('partidos') }}">Volver a Partidos</a><br />
+
+{% endblock %}
+
+{% block footer_js %}
+    <script type="text/javascript">
+        $( document ).ready(function() {});
+    </script>
+{% endblock %}
