@@ -381,7 +381,7 @@ $app->match('/admin/partido/{matchId}/eventos', function($matchId, Request $requ
     // get match from DB
     $match = $app['db']->fetchAssoc('SELECT * FROM f7_match WHERE id = ?', array(intval($matchId)));
 
-    // if match exist, get events to add at match
+    // if match exist, get events and players to add at match
     if ($match) {
         $events = $app['db']->fetchAll('SELECT * FROM f7_event');
         if ($events) {
@@ -396,13 +396,122 @@ $app->match('/admin/partido/{matchId}/eventos', function($matchId, Request $requ
                 return $e;
             };
         }
+
+        $home_squad = $app['db']->fetchAll('SELECT * FROM f7_squad WHERE team_id = ? AND match_id = ?', array(intval($match['home_team']), intval($matchId)));
+
+        $home_players = $app['db']->fetchAll('SELECT * FROM f7_player WHERE team_id = ?', array(intval($match['home_team'])));
+        if ($home_players) {
+            $home_players_choice = function() use ($app,$home_players) {
+                if (count($home_players) == 0)
+                    return array();
+
+                $p = array();
+                foreach($home_players as $idx=>$player) {
+                    $p[$player['id']] = $player['name'];
+                }
+                return $p;
+            };
+        }
+
+        $away_squad = $app['db']->fetchAll('SELECT * FROM f7_squad WHERE team_id = ? AND match_id = ?', array(intval($match['away_team']), intval($matchId)));
+
+        $away_players = $app['db']->fetchAll('SELECT * FROM f7_player WHERE team_id = ?', array(intval($match['away_team'])));
+        if ($away_players) {
+            echo "away_players";
+            $away_players_choice = function() use ($away_players) {
+                if (count($away_players) == 0)
+                    return array();
+
+                $p = array();
+                foreach($away_players as $player) {
+                    $p[$player['id']] = $player['name'];
+                }
+                return $p;
+            };
+        }
+
+        $form = $app['form.factory']->createBuilder('form')
+            ->add(
+                'home_events', 'choice',
+                array(
+                    'label' => 'Eventos',
+                    'choices' => ($events) ? $event_choice() : array()
+                )
+            )
+            ->add(
+                'home_players', 'choice',
+                array(
+                    'label' => 'Jugadores Locales',
+                    'choices' => ($home_players) ? $home_players_choice() : array()
+                )
+            )
+            ->add(
+                'event_count_h', 'text',
+                array(
+                    'label' => 'Cantidad',
+                    'required' => true
+                )
+            )
+            ->add(
+                'away_events', 'choice',
+                array(
+                    'label' => 'Eventos',
+                    'choices' => ($events)?$event_choice():array()
+                )
+            )
+            ->add(
+                'away_players', 'choice',
+                array(
+                    'label' => 'Jugadores Visitantes',
+                    'choices' => ($away_players)?$away_players_choice():array()
+                )
+            )
+            ->add(
+                'event_count_a', 'text',
+                array(
+                    'label' => 'Cantidad',
+                    'required' => true
+                )
+            )
+            ->add('name','text',array('data'=>'test'))
+            ->getForm();
+
+
+    }
+
+    $form->handleRequest($request);
+
+    if ($form->isValid() && $form->isSubmitted()) {
+        $data = $form->getData();
+dump($data);
+        // save squads of match
+        /*
+        if (!empty($data['home_players'])) {
+            $app['db']->delete('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team']));
+
+            foreach($data['home_players'] as $squad) {
+                $app['db']->insert('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team'], 'player_id'=>$squad));
+            }
+        }
+
+        if (!empty($data['away_players'])) {
+            $app['db']->delete('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team']));
+
+            foreach($data['away_players'] as $squad) {
+                $app['db']->insert('f7_squad', array('match_id'=>$matchId, 'team_id'=>$match['home_team'], 'player_id'=>$squad));
+            }
+        }
+
+        return $app->redirect($app['url_generator']->generate('detalle_partido',array('matchId'=>$matchId)));
+        */
     }
 
     return $app['twig']
         ->render('admin/match_events.html.twig',
             array(
                 'matchId' => $matchId,
-                'match' => ($match)?:false
+                'match' => ($match)?:false,
+                'form' => ($form)?$form->createView():false
             )
         );
 })

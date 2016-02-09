@@ -25,6 +25,61 @@
             </ul>
         </div>
 
+        {% if form %}
+            <form action="" method="post">
+                {{ form_errors(form) }}
+                {{ form_widget(form._token) }}
+
+                <div>
+                    MATCH :: HOME EVENTS :: ...<br />
+                </div>
+
+                <div>
+                    {{ form_label(form.home_events) }}
+                    {{ form_errors(form.home_events) }}
+                    {{ form_widget(form.home_events) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.home_players) }}
+                    {{ form_errors(form.home_players) }}
+                    {{ form_widget(form.home_players) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.event_count_h) }}
+                    {{ form_errors(form.event_count_h) }}
+                    {{ form_widget(form.event_count_h) }}
+                </div>
+
+                <div>
+                    MATCH :: AWAY EVENTS :: ...<br />
+                </div>
+
+                <div>
+                    {{ form_label(form.away_events) }}
+                    {{ form_errors(form.away_events) }}
+                    {{ form_widget(form.away_events) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.away_players) }}
+                    {{ form_errors(form.away_players) }}
+                    {{ form_widget(form.away_players) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.event_count_a) }}
+                    {{ form_errors(form.event_count_a) }}
+                    {{ form_widget(form.event_count_a) }}
+                </div>
+
+                <br />
+
+                <input type="submit" name="submit" value="Enviar Form" />
+            </form><br />
+        {% endif %}
+{#
         <div>
             MATCH :: HOME EVENTS :: {{ home_events|length }}<br />
             <ul>
@@ -50,7 +105,7 @@
                 {% endif %}
             </ul>
         </div>
-
+#}
     {% endif %}
 
     <a href="{{ app.url_generator.generate('partidos') }}">Volver a Partidos</a><br />
